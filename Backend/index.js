@@ -1,16 +1,26 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express"
+import "dotenv/config"
+import cookieParser from "cookie-parser";
+
+import { connectDB } from "./lib/db.js" 
+import { verifyToken } from "./middlewares/auth.middleware.js";
+import authRoute from "./routes/auth.route.js"
+import serviceRoute from "./routes/service.route.js"
 
 const app = express();
+const PORT = process.env.PORT;
 
-app.use(cors({
-  origin: 'http://localhost:5173'
-}));
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+app.use(cookieParser());
 
-app.get("/api", (req,res)=> {
-    return res.json({"fruits": ["apple","orange","banana"]})
-});
+app.use("/api/auth",authRoute);
 
-app.listen(8080, ()=> {
-    console.log(`Server started at PORT 8080`);
-});
+app.use(verifyToken);
+
+app.use("/api/services",serviceRoute);
+
+app.listen(PORT, ()=> {
+    console.log(`Server running at PORT ${PORT}`);
+    connectDB();
+})
