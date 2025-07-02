@@ -19,7 +19,6 @@ export const verifyToken = async (req, res, next) => {
         req.user = user;    
         next();
     } catch (error) {
-        console.log("Error in verify token middleware", error);
-        res.status(401).json({ message: "Invalid or expired token" });
+        res.status(500).json({ success: false, data: "Error in verify token middleware" });
     }
 }
