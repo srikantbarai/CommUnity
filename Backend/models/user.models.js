@@ -25,11 +25,12 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     try {
-        const salt = await bcrypt.genSalt(10);
+        const saltRounds = parseInt(process.env.saltRounds)
+        const salt = await bcrypt.genSalt(saltRounds);
         this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (error) {
-        console.error("Error is password hash")
+        console.error("Error in password hash",error);
         process.exit(1);
     }
 });
