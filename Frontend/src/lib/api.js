@@ -17,6 +17,7 @@ export const logout = async () => {
 
 export const getMyInfo = async () => {
     const res = await axiosInstance.get("/user/me");
+    console.log(res.data);
     return res.data;
 }
 

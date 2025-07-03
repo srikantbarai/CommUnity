@@ -6,30 +6,38 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^(\+91[\s-]?)?[6-9]\d{9}$/;
 
 export const listServices = async (req, res) => {
-    const allServices = await Service.find({});
-    return res.status(200).json({success: true, data: allServices});
-}
-
-export const listServiceDetails = async (req,res) => {
-    const service = await Service.findById(req.params.serviceId);
-    if (!service) {
-        return res.status(404).json({ success: false, data: "Service not found" });
+    try {
+        const allServices = await Service.find({});
+        return res.status(200).json({ data: allServices });
+    } catch (error) {
+        return res.status(500).json({ data: "Error fetching services" });
     }
-    return res.status(200).json({success: true, data:service});
 }
 
-export const registerService = async (req,res) => {
-    const {enterpriseName, category, description, address, city, state, phone, email, imageUrl } = req.body;
+export const listServiceDetails = async (req, res) => {
+    try {
+        const service = await Service.findById(req.params.serviceId);
+        if (!service) {
+            return res.status(404).json({ data: "Service not found" });
+        }
+        return res.status(200).json({ data: service });
+    } catch (error) {
+        return res.status(500).json({ data: "Error fetching service details" });
+    }
+}
+
+export const registerService = async (req, res) => {
+    const { enterpriseName, category, description, address, city, state, phone, email, imageUrl } = req.body;
     const ownerId = req.user._id;
     try {
-        if (!enterpriseName || !category || !description || !address || !city || !state || !phone || !email && !imageUrl) {
-            return res.status(400).json({success: false, data: "All fields are required" });
+        if (!enterpriseName || !category || !description || !address || !city || !state || !phone || !email || !imageUrl) {
+            return res.status(400).json({ data: "All fields are required" });
         }
         if (!emailRegex.test(email)) {
-            return res.status(400).json({success: false, data: "Invalid email format" });
+            return res.status(400).json({ data: "Invalid email format" });
         }
         if (!phoneRegex.test(phone)) {
-            return res.status(400).json({success: false, data: "Invalid Phone number format" });
+            return res.status(400).json({ data: "Invalid phone number format" });
         }
         const newService = await Service.create({
             enterpriseName, 
@@ -41,27 +49,27 @@ export const registerService = async (req,res) => {
             ownerId: ownerId,
             imageUrl
         });
-        return res.status(201).json({success: true, data: newService});
+        return res.status(201).json({ data: newService });
     } catch (error) {
-        return res.status(500).json({success: false, data: "Service register error"})
+        return res.status(500).json({ data: "Service register error" });
     }
 }
 
 export const editService = async (req, res) => {
-    const { enterpriseName, description, address, city, state, phone, email, imageUrl} = req.body;
+    const { enterpriseName, description, address, city, state, phone, email, imageUrl } = req.body;
     const userId = req.user._id;
     const serviceId = req.params.serviceId;
 
     try {
         if (!enterpriseName && !description && !address && !city && !state && !phone && !email && !imageUrl) {
-            return res.status(400).json({ success: false, data: "At least one field is required" });
+            return res.status(400).json({ data: "At least one field is required" });
         }
         const service = await Service.findById(serviceId);
         if (!service) {
-            return res.status(404).json({ success: false, data: "Service not found" });
+            return res.status(404).json({ data: "Service not found" });
         }
         if (service.ownerId.toString() !== userId.toString()) {
-            return res.status(403).json({ success: false, data: "Not authorized to edit this service" });
+            return res.status(403).json({ data: "Not authorized to edit this service" });
         }
         if (enterpriseName) service.enterpriseName = enterpriseName;
         if (description) service.description = description;
@@ -70,45 +78,46 @@ export const editService = async (req, res) => {
         if (state) service.location.state = state;
         if (phone) {
             if (!phoneRegex.test(phone)) {
-                return res.status(400).json({ success: false, data: "Invalid phone number format" });
+                return res.status(400).json({ data: "Invalid phone number format" });
             }
             service.contact_info.phone = phone;
         }
         if (email) {
             if (!emailRegex.test(email)) {
-                return res.status(400).json({ success: false, data: "Invalid email format" });
+                return res.status(400).json({ data: "Invalid email format" });
             }
             service.contact_info.email = email;
         }
         if (imageUrl) service.imageUrl = imageUrl;
         const updatedService = await service.save();
-        return res.status(200).json({ success: true, data: updatedService });
+        return res.status(200).json({ data: updatedService });
     } catch (error) {
-        return res.status(500).json({success: false, data: "Edit Service Error"})
+        return res.status(500).json({ data: "Edit Service Error" });
     }
 }
 
-export const deleteService = async (req,res) => {
+export const deleteService = async (req, res) => {
     const userId = req.user._id;
     const serviceId = req.params.serviceId;
     const password = req.body.password;
     try {
         const service = await Service.findById(serviceId);
         if (!service) {
-            return res.status(404).json({ success: false, data: "Service not found" });
+            return res.status(404).json({ data: "Service not found" });
         }
         if (service.ownerId.toString() !== userId.toString()) {
-            return res.status(403).json({ success: false, data: "Not authorized to delete this service" });
+            return res.status(403).json({ data: "Not authorized to delete this service" });
         }
         
         const user = await User.findById(userId);
         const isPasswordCorrect = await user.matchPassword(password);
-        if (!isPasswordCorrect) return res.status(401).json({success: false, data: "Invalid password" });
-
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ data: "Invalid password" });
+        }
         const deletedService = await Service.findByIdAndDelete(serviceId);
         await Review.deleteMany({ serviceId: serviceId });
-        return res.status(200).json({success: true, data: deletedService});
+        return res.status(200).json({ data: deletedService });
     } catch(error) {
-        return res.status(500).json({success: false, data: "Delete Service Error"})
+        return res.status(500).json({ data: "Delete Service Error" });
     }
 }
