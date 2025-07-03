@@ -19,6 +19,6 @@ export const verifyToken = async (req, res, next) => {
         req.user = user;    
         next();
     } catch (error) {
-        res.status(500).json({ success: false, data: "Error in verify token middleware" });
+        return res.status(500).json({ success: false, data: "Error in verify token middleware" });
     }
 }

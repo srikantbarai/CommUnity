@@ -1,6 +1,7 @@
 import express from "express"
 import "dotenv/config"
 import cookieParser from "cookie-parser";
+import cors from "cors"
 
 import { connectDB } from "./lib/db.js" 
 import { verifyToken } from "./middlewares/auth.middleware.js";

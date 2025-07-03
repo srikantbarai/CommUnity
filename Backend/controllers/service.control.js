@@ -1,4 +1,5 @@
-import Service from "../models/service.model.js"
+import User from "../models/user.models.js"
+import Service from "../models/service.model.js";
 import Review from "../models/review.model.js";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -90,7 +91,7 @@ export const editService = async (req, res) => {
 export const deleteService = async (req,res) => {
     const userId = req.user._id;
     const serviceId = req.params.serviceId;
-
+    const password = req.body.password;
     try {
         const service = await Service.findById(serviceId);
         if (!service) {
@@ -99,6 +100,11 @@ export const deleteService = async (req,res) => {
         if (service.ownerId.toString() !== userId.toString()) {
             return res.status(403).json({ success: false, data: "Not authorized to delete this service" });
         }
+        
+        const user = await User.findById(userId);
+        const isPasswordCorrect = await user.matchPassword(password);
+        if (!isPasswordCorrect) return res.status(401).json({success: false, data: "Invalid password" });
+
         const deletedService = await Service.findByIdAndDelete(serviceId);
         await Review.deleteMany({ serviceId: serviceId });
         return res.status(200).json({success: true, data: deletedService});

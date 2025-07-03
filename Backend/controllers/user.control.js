@@ -27,6 +27,6 @@ export const updateMyInfo = async (req,res) => {
 }
 
 export const getUserInfo = async (req,res) => {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.userId);
     return res.status(200).json({success: true, data: user});
 }
