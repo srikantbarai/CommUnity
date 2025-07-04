@@ -2,10 +2,7 @@ import User from "../models/user.models.js"
 
 export const getMyInfo = async (req, res) => {
     try {
-        const me = await User.findById(req.user._id);
-        if (!me) {
-            return res.status(404).json({ data: "User not found" });
-        }
+        const me = await User.findById(req.user._id).select("-password");
         return res.status(200).json({ data: me });
     } catch (error) {
         return res.status(500).json({ data: "Error fetching user info" });

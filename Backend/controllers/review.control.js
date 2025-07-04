@@ -79,7 +79,6 @@ export const editReviewForService = async (req, res) => {
 export const deleteReviewForService = async (req, res) => {
     const userId = req.user._id;
     const serviceId = req.params.serviceId;
-    
     try {
         const service = await Service.findById(serviceId);
         if (!service) {

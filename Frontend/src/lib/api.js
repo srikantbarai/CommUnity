@@ -17,7 +17,6 @@ export const logout = async () => {
 
 export const getMyInfo = async () => {
     const res = await axiosInstance.get("/user/me");
-    console.log(res.data);
     return res.data;
 }
 
@@ -31,8 +30,10 @@ export const getUserInfo = async (userId) => {
     return res.data;
 }
 
-export const listServices = async () => {
-    const res = await axiosInstance.get("/services");
+export const listServices = async (filters) => {
+    const res = await axiosInstance.get("/services",{
+        params: filters
+    });
     return res.data;
 }
 
@@ -51,8 +52,12 @@ export const editService = async (serviceId,editServiceData) => {
     return res.data;
 }
 
-export const deleteService = async (serviceId,deleteServiceData) => {
-    const res = await axiosInstance.get(`/services/${serviceId}`,deleteServiceData);
+export const deleteService = async (serviceId, password) => {
+    const res = await axiosInstance.delete(`/services/${serviceId}`, {
+        headers: {
+            'X-User-Password': password
+        }
+    });
     return res.data;
 }
 

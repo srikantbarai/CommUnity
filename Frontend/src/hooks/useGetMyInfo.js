@@ -8,11 +8,11 @@ const useGetMyInfo = () => {
     retry: false
   });
 
-  const isUnauthorized = error?.response?.status === 401;
+  const isUnauthenticated = error?.response?.status === 401;
 
   return {
+    myInfo: isUnauthenticated ? null : data?.data,
     isLoading,
-    myInfo: isUnauthorized ? null : data,
     error,
   };
 };

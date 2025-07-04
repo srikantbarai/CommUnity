@@ -7,12 +7,19 @@ const phoneRegex = /^(\+91[\s-]?)?[6-9]\d{9}$/;
 
 export const listServices = async (req, res) => {
     try {
-        const allServices = await Service.find({});
-        return res.status(200).json({ data: allServices });
+        const { category, city, state } = req.query;
+        const filter = {};
+        if (category) filter.category = category;
+        if (city) filter.city = city;
+        if (state) filter.state = state;
+        const services = await Service.find(filter);
+        return res.status(200).json({ data: services });
     } catch (error) {
+        console.error("Error fetching services:", error);
         return res.status(500).json({ data: "Error fetching services" });
     }
-}
+};
+
 
 export const listServiceDetails = async (req, res) => {
     try {
@@ -99,7 +106,7 @@ export const editService = async (req, res) => {
 export const deleteService = async (req, res) => {
     const userId = req.user._id;
     const serviceId = req.params.serviceId;
-    const password = req.body.password;
+    const password = req.headers['X-User-Password'];
     try {
         const service = await Service.findById(serviceId);
         if (!service) {
