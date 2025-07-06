@@ -111,8 +111,8 @@ const SignupPage = () => {
       <div>
         <img src="logo.jpg" />
         <div>
-          <p><strong>Join CommUnity Today</strong></p>
           <p>Discover and review trusted local service providers in every city and state — from tech experts to home repair professionals. Explore detailed profiles, read real user feedback, and connect with the right people. Smart, reliable, and community-powered.</p>
+          <p><strong>Join CommUnity Today</strong></p>
         </div>
       </div>
     </div>
