@@ -9,7 +9,7 @@ const LoginPage = () => {
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false)
-  const {loginMutation, isPending, error} = useLogin();
+  const {mutate: loginMutation, isPending, error} = useLogin();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -21,6 +21,8 @@ const LoginPage = () => {
       <div className="signup-wrapper">
         {error && ( <span> {error?.response?.data?.data} </span>)}
         <div className="welcome-text">
+          <p>CommUnity</p>
+          <p>Connect with Trusted Experts Around You !!</p>
           <h1>Welcome back, login to your account</h1>
         </div>
         <form onSubmit={handleLogin}>
@@ -73,6 +75,13 @@ const LoginPage = () => {
             </p>
           </div>
         </form>
+      </div>
+      <div>
+        <img src="logo.jpg" />
+        <div>
+          <p><strong>Join CommUnity Today</strong></p>
+          <p>Discover and review trusted local service providers in every city and state — from tech experts to home repair professionals. Explore detailed profiles, read real user feedback, and connect with the right people. Smart, reliable, and community-powered.</p>
+        </div>
       </div>
     </div>
   );

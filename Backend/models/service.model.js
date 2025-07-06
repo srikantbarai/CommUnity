@@ -76,17 +76,6 @@ serviceSchema.methods.updateAverageRatingOnNewReview = async function(rating) {
     }
 }
 
-serviceSchema.methods.updateAverageRatingOnEditReview = async function(oldRating,newRating) {
-    try {
-        const totalRating = this.averageRating*this.reviewCount
-        this.averageRating = (totalRating-oldRating+newRating)/(this.reviewCount);
-        await this.save();
-    } catch (error) {
-        console.error('Error updating average rating2:', error);
-        process.exit(1);
-    }
-}
-
 serviceSchema.methods.updateAverageRatingOnDeleteReview = async function(rating) {
     try {
         const totalRating = this.averageRating*this.reviewCount

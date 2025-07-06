@@ -9,7 +9,7 @@ const useSignup = () => {
         mutationFn: signup,
         onSuccess: () => navigate("/login")
     });
-    return {signupMutation: mutate, isPending, error}
+    return {mutate, isPending, error}
 }
 
 export default useSignup;

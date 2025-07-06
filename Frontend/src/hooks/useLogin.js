@@ -12,7 +12,7 @@ const useLogin = () => {
             navigate("/");
         } 
     });
-    return {loginMutation: mutate, isPending, error}
+    return {mutate, isPending, error}
 }
 
 export default useLogin;

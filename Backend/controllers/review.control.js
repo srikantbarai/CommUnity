@@ -4,7 +4,10 @@ import Service from "../models/service.model.js";
 export const getAllReviewsForService = async (req, res) => {
     try {
         const serviceId = req.params.serviceId;
-        const reviews = await Review.find({ serviceId: serviceId });
+        const reviews = await Review.find({ serviceId: serviceId }).populate({
+            path: "userId",
+            select: "-password"
+        }).sort("-createdAt");
         return res.status(200).json({ data: reviews });
     } catch (error) {
         return res.status(500).json({ data: "Error fetching reviews" });
@@ -35,46 +38,6 @@ export const createReviewForService = async (req, res) => {
         return res.status(500).json({ data: "Create Review Error" });
     }
 }
-
-export const editReviewForService = async (req, res) => {
-    const userId = req.user._id;
-    const serviceId = req.params.serviceId;
-    const { rating, comment } = req.body;
-    
-    try {
-        if (!rating && !comment) {
-            return res.status(400).json({ data: "At least one field (rating or comment) is required" });
-        }
-        const service = await Service.findById(serviceId);
-        if (!service) {
-            return res.status(404).json({ data: "Service not found" });
-        }
-        const review = await Review.findById(req.params.reviewId);
-        if (!review) {
-            return res.status(404).json({ data: "Review not found" });
-        }
-        if (review.userId.toString() !== userId.toString()) {
-            return res.status(403).json({ data: "Not authorized to edit this review" });
-        }
-        if (review.serviceId.toString() !== serviceId.toString()) {
-            return res.status(400).json({ data: "Review does not belong to this service" });
-        }
-        const oldRating = review.rating;
-    
-        if (rating) review.rating = parseInt(rating);
-        if (comment) review.comment = comment;
-        
-        const updatedReview = await review.save();
-
-        if (rating && parseInt(rating) !== oldRating) {
-            await service.updateAverageRatingOnEditReview(oldRating, parseInt(rating));
-        }
-
-        return res.status(200).json({ data: updatedReview });
-    } catch (error) {
-        return res.status(500).json({ data: "Edit Review Error" });
-    }
-};
 
 export const deleteReviewForService = async (req, res) => {
     const userId = req.user._id;

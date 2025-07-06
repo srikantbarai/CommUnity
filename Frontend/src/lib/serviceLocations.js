@@ -1289,5 +1289,5 @@ export const serviceLocations = {
 ]
 }
 
-export const stateEnum = Object.keys(serviceLocations);
+export const stateEnum = Object.keys(serviceLocations).sort();
 export const cityEnum = Object.values(serviceLocations).flat();

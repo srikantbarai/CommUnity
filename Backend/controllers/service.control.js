@@ -7,12 +7,16 @@ const phoneRegex = /^(\+91[\s-]?)?[6-9]\d{9}$/;
 
 export const listServices = async (req, res) => {
     try {
-        const { category, city, state } = req.query;
+        const {userServices, category, city, state } = req.query;
+        if (userServices) {
+            const services = await Service.find({ownerId: req.user._id}).sort("-averageRating")
+            return res.status(200).json({ data: services });
+        }
         const filter = {};
         if (category) filter.category = category;
-        if (city) filter.city = city;
-        if (state) filter.state = state;
-        const services = await Service.find(filter);
+        if (city) filter['location.city'] = city; 
+        if (state) filter['location.state'] = state;
+        const services = await Service.find(filter).sort("averageRating");
         return res.status(200).json({ data: services });
     } catch (error) {
         console.error("Error fetching services:", error);
@@ -20,10 +24,12 @@ export const listServices = async (req, res) => {
     }
 };
 
-
 export const listServiceDetails = async (req, res) => {
     try {
-        const service = await Service.findById(req.params.serviceId);
+        const service = await Service.findById(req.params.serviceId).populate({
+            path: "ownerId",
+            select: "-password"
+        });
         if (!service) {
             return res.status(404).json({ data: "Service not found" });
         }
@@ -63,12 +69,12 @@ export const registerService = async (req, res) => {
 }
 
 export const editService = async (req, res) => {
-    const { enterpriseName, description, address, city, state, phone, email, imageUrl } = req.body;
+    const { description, address, city, state, phone, email, imageUrl } = req.body;
     const userId = req.user._id;
     const serviceId = req.params.serviceId;
 
     try {
-        if (!enterpriseName && !description && !address && !city && !state && !phone && !email && !imageUrl) {
+        if (!description && !address && !city && !state && !phone && !email && !imageUrl) {
             return res.status(400).json({ data: "At least one field is required" });
         }
         const service = await Service.findById(serviceId);
@@ -78,7 +84,6 @@ export const editService = async (req, res) => {
         if (service.ownerId.toString() !== userId.toString()) {
             return res.status(403).json({ data: "Not authorized to edit this service" });
         }
-        if (enterpriseName) service.enterpriseName = enterpriseName;
         if (description) service.description = description;
         if (address) service.address = address;
         if (city) service.location.city = city;
@@ -106,7 +111,7 @@ export const editService = async (req, res) => {
 export const deleteService = async (req, res) => {
     const userId = req.user._id;
     const serviceId = req.params.serviceId;
-    const password = req.headers['X-User-Password'];
+    const password = req.headers['x-user-password'];
     try {
         const service = await Service.findById(serviceId);
         if (!service) {

@@ -25,11 +25,6 @@ export const updateMyInfo = async (updateMyInfoData) => {
     return res.data;
 }
 
-export const getUserInfo = async (userId) => {
-    const res = await axiosInstance.get(`/user/${userId}`);
-    return res.data;
-}
-
 export const listServices = async (filters) => {
     const res = await axiosInstance.get("/services",{
         params: filters
@@ -38,7 +33,7 @@ export const listServices = async (filters) => {
 }
 
 export const registerService = async (registerServiceData) => {
-    const res = await axiosInstance.post("/services");
+    const res = await axiosInstance.post("/services",registerServiceData);
     return res.data;
 }
 
@@ -71,12 +66,19 @@ export const createReviewForService = async (serviceId,createReviewForServiceDat
     return res.data;
 }
 
-export const editReviewForService = async (serviceId,reviewId,editReviewForServiceData) => {
-    const res = await axiosInstance.patch(`/services/${serviceId}/reviews/${reviewId}`,editReviewForServiceData);
-    return res.data;
-}
-
 export const deleteReviewForService = async (serviceId,reviewId) => {
     const res = await axiosInstance.delete(`/services/${serviceId}/reviews/${reviewId}`);
     return res.data;
+}
+
+export const uploadToClaudinary = async (file) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "CommUnity");
+    data.append("cloud_name", "dhgflpbge");
+    const res = await fetch("https://api.cloudinary.com/v1_1/dhgflpbge/image/upload", {
+        method: "POST",
+        body: data
+    });
+    return await res.json().url;
 }
