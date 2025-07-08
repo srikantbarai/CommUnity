@@ -8,8 +8,8 @@ const useLogout = () => {
     const { mutate, isPending, error } = useMutation({
         mutationFn: logout,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["myInfo"] });
-            navigate("/");
+            queryClient.setQueryData(["myInfo"], null);
+            navigate("/login");
         }
     });
     return { mutate, isPending, error };

@@ -73,12 +73,12 @@ export const deleteReviewForService = async (serviceId,reviewId) => {
 
 export const uploadToClaudinary = async (file) => {
     const data = new FormData();
-    data.append("file", file);
+    data.append("file", file); 
     data.append("upload_preset", "CommUnity");
     data.append("cloud_name", "dhgflpbge");
     const res = await fetch("https://api.cloudinary.com/v1_1/dhgflpbge/image/upload", {
         method: "POST",
         body: data
     });
-    return await res.json().url;
+    return (await res.json()).url;  
 }
