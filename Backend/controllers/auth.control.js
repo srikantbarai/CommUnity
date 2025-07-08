@@ -52,7 +52,15 @@ export const login = async (req, res) => {
         const token = jwt.sign(payload, secret, {
             expiresIn: "3d"
         });
-        res.cookie("jwt", token);
+        
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            path: '/',
+            maxAge: 3*24*60*60*1000 
+        });
+        
         return res.status(200).json({ data: user });
     } catch (error) {
         return res.status(500).json({ data: "Login error" });
@@ -61,7 +69,13 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
     try {
-        res.clearCookie("jwt");
+        res.cookie('jwt', '', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            path: '/',
+            expires: new Date(0)
+        });
         return res.status(200).json({ data: "Logout successful" });
     } catch (error) {
         return res.status(500).json({ data: "Logout error" });
