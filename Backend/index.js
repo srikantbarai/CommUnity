@@ -44,7 +44,7 @@ app.use("/api/services/:serviceId/reviews", reviewRoute);
 app.use("/api/services", serviceRoute);
 app.use("/api/user", userRoute);
 
-app.listen(PORT, ()=> {
-    console.log(`Server running at PORT ${PORT}`);
-    connectDB();
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running at PORT ${PORT}`);
+  connectDB();
 });
