@@ -8,6 +8,7 @@ import { connectDB } from "./lib/db.js";
 import { verifyToken } from "./middlewares/auth.middleware.js";
 
 import authRoute from "./routes/auth.route.js";
+import aiRoutes from "./routes/ai.route.js"
 import reviewRoute from "./routes/review.route.js";
 import serviceRoute from "./routes/service.route.js";
 import userRoute from "./routes/user.route.js";
@@ -56,6 +57,7 @@ const apiLimiter = rateLimit({
 app.use(apiLimiter);
 app.use(verifyToken);
 
+app.use("/api/services/:serviceId/reviews/ai", aiRoutes);
 app.use("/api/services/:serviceId/reviews", reviewRoute);
 app.use("/api/services", serviceRoute);
 app.use("/api/user", userRoute);

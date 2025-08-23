@@ -61,6 +61,11 @@ export const getAllReviewsForService = async (serviceId) => {
     return res.data;
 }
 
+export const getAISummaryOfReviews = async (serviceId) => {
+  const res = await axiosInstance.get(`services/${serviceId}/reviews/ai`);
+  return res.data;
+};
+
 export const createReviewForService = async (serviceId,createReviewForServiceData) => {
     const res = await axiosInstance.post(`/services/${serviceId}/reviews`,createReviewForServiceData);
     return res.data;

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Star } from 'lucide-react';
+import { Star, Bot } from 'lucide-react';
 
 import Navbar from '../components/Navbar';
 import ReviewCard from '../components/ReviewCard';
 import useGetMyInfo from '../hooks/useGetMyInfo';
-import {listServiceDetails,createReviewForService,getAllReviewsForService,deleteReviewForService} from '../lib/api';
+import {listServiceDetails,createReviewForService,getAllReviewsForService,getAISummaryOfReviews,deleteReviewForService} from '../lib/api';
+
 
 const ServicePage = () => {
   const queryClient = useQueryClient();
@@ -27,11 +28,18 @@ const ServicePage = () => {
     select: (data) => data.data,
   });
 
+  const { data: aiSummaryData, isLoading: aiSummaryLoading, error: aiSummaryError } = useQuery({
+    queryKey: ['aiSummary', serviceId],
+    queryFn: () => getAISummaryOfReviews(serviceId),
+    select: (data) => data.data,
+  });
+
   const createReviewMutation = useMutation({
     mutationFn: (reviewData) => createReviewForService(serviceId, reviewData),
     onSuccess: () => {
       queryClient.invalidateQueries(['serviceDetails', serviceId]);
       queryClient.invalidateQueries(['reviews', serviceId]);
+      queryClient.invalidateQueries(['aiSummary', serviceId]);
       setComment('');
       setRating(5);
     },
@@ -42,6 +50,7 @@ const ServicePage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['serviceDetails', serviceId]);
       queryClient.invalidateQueries(['reviews', serviceId]);
+      queryClient.invalidateQueries(['aiSummary', serviceId]); 
     },
   });
 
@@ -135,6 +144,32 @@ const ServicePage = () => {
             <p className="text-sm">{serviceData.ownerId.email}</p>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto mt-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-md border border-blue-200">
+        <div className="flex items-center gap-2 mb-3">
+          <Bot className="text-blue-600" size={24} />
+          <h2 className="text-xl font-bold text-gray-800">AI Review Summary</h2>
+        </div>
+        
+        {aiSummaryLoading && (
+          <div className="flex items-center gap-2 text-gray-600">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span>Generating AI summary...</span>
+          </div>
+        )}
+        
+        {aiSummaryError && (
+          <div className="text-red-600 text-sm">
+            Error loading AI summary: {aiSummaryError.response?.data?.data}
+          </div>
+        )}
+        
+        {aiSummaryData && (
+          <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
+            <p className="text-gray-700 leading-relaxed">{aiSummaryData}</p>
+          </div>
+        )}
       </div>
 
       <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
