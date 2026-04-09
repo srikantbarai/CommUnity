@@ -23,18 +23,14 @@ router.post("/signup", signup);
 router.post("/login", loginLimiter, login);
 router.post("/logout", logout);
 
-router.get(
-  "/google",
-  ensureGoogleOAuthConfigured,
+router.get("/google",ensureGoogleOAuthConfigured,
   passport.authenticate("google", {
     scope: ["profile", "email"],
     prompt: "select_account",
   })
 );
 
-router.get(
-  "/google/callback",
-  ensureGoogleOAuthConfigured,
+router.get("/google/callback",ensureGoogleOAuthConfigured,
   passport.authenticate("google", {
     failureRedirect: "/api/auth/google/failure",
   }),

@@ -70,7 +70,6 @@ export const login = async (req, res) => {
 
 export const googleCallback = async (req, res) => {
     try {
-        // `req.user` is set by passport strategy
         const user = req.user;
         if (!user?._id) {
             return res.status(401).json({ data: "Google login failed" });
