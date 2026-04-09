@@ -7,6 +7,6 @@ router.get("/", listServices);
 router.post("/", registerService);
 router.get("/:serviceId", listServiceDetails);
 router.patch("/:serviceId",editService);
-router.delete("/:serviceId",deleteService);
+router.delete("/:serviceId",deleteService); 
 
 export default router;

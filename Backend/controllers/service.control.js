@@ -22,7 +22,7 @@ export const listServices = async (req, res) => {
         console.error("Error fetching services:", error);
         return res.status(500).json({ data: "Error fetching services" });
     }
-};
+}; 
 
 export const listServiceDetails = async (req, res) => {
     try {

@@ -6,4 +6,4 @@ const router = express.Router();
 router.get("/me",getMyInfo);
 router.patch("/me",updateMyInfo);
 
-export default router;
+export default router; 

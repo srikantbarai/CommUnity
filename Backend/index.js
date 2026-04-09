@@ -60,7 +60,7 @@ app.use(verifyToken);
 app.use("/api/services/:serviceId/reviews/ai", aiRoutes);
 app.use("/api/services/:serviceId/reviews", reviewRoute);
 app.use("/api/services", serviceRoute);
-app.use("/api/user", userRoute);
+app.use("/api/user", userRoute); 
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
