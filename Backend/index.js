@@ -3,9 +3,12 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+import session from "express-session";
+import passport from "passport";
 
 import { connectDB } from "./lib/db.js";
 import { verifyToken } from "./middlewares/auth.middleware.js";
+import { configurePassport } from "./lib/passport.js";
 
 import authRoute from "./routes/auth.route.js";
 import aiRoutes from "./routes/ai.route.js"
@@ -44,8 +47,6 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-app.use("/api/auth", authRoute);
-
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,  
   max: 50,  
@@ -53,6 +54,25 @@ const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false
 });
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || process.env.jwtsecret || "change-me",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    },
+  })
+);
+
+configurePassport();
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use("/api/auth", authRoute);
 
 app.use(apiLimiter);
 app.use(verifyToken);

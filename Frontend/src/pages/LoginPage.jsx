@@ -17,6 +17,16 @@ const LoginPage = () => {
     loginMutation(loginData);
   };
 
+  const handleGoogleLogin = () => {
+    const base = import.meta.env.VITE_BACKEND_URL;
+    if (!base) {
+      // Fallback to relative path if env isn't set
+      window.location.href = "/api/auth/google";
+      return;
+    }
+    window.location.href = `${base.replace(/\/+$/, "")}/api/auth/google`;
+  };
+
   return (
     <div className="h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-4xl w-full max-h-[90vh] bg-white shadow-xl rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
@@ -36,6 +46,20 @@ const LoginPage = () => {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-2 rounded-md transition duration-200 border border-gray-300 flex items-center justify-center gap-2"
+            >
+              <span className="text-sm">Continue with Google</span>
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="h-px bg-gray-200 flex-1" />
+              <div className="text-xs text-gray-400">or</div>
+              <div className="h-px bg-gray-200 flex-1" />
+            </div>
+
             <div>
               <label htmlFor="email" className="flex items-center text-gray-700 font-medium mb-1 gap-2">
                 <Mail className="w-4 h-4" />

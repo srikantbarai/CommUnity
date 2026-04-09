@@ -13,17 +13,26 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: function () {
+            return !this.googleId;
+        },
+        default: null
     },
     profilePicUrl: {
         type: String,
         default: null
+    },
+    googleId: {
+        type: String,
+        default: null,
+        index: true
     },
 }, {timestamps: true}
 );
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
+    if (!this.password) return next();
     try {
         const saltRounds = parseInt(process.env.saltRounds)
         const salt = await bcrypt.genSalt(saltRounds);
@@ -36,6 +45,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) return false;
   const isPasswordCorrect = await bcrypt.compare(enteredPassword, this.password);
   return isPasswordCorrect;
 };
